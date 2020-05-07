@@ -31,6 +31,7 @@ import det_model_fn
 import hparams_config
 import utils
 
+from datetime import datetime
 
 # Cloud TPU Cluster Resolvers
 flags.DEFINE_string(
@@ -290,9 +291,7 @@ def main(argv):
           steps=FLAGS.eval_samples//FLAGS.eval_batch_size)
       logging.info('Eval results: %s', eval_results)
       ckpt = tf.train.latest_checkpoint(FLAGS.model_dir)
-      logging.info(f'save_checkpoint_start for epoch: {cycle}')
       utils.archive_ckpt(eval_results, eval_results['AP'], ckpt)
-      logging.info(f'save_checkpoint_end for epoch: {cycle}')
 
   elif FLAGS.mode == 'eval':
     # Eval only runs on CPU or GPU host with batch_size = 1.
@@ -394,7 +393,14 @@ def main(argv):
           steps=FLAGS.eval_samples//FLAGS.eval_batch_size)
       logging.info('Evaluation results: %s', eval_results)
       ckpt = tf.train.latest_checkpoint(FLAGS.model_dir)
+      logging.info(f'save_checkpoint_start for epoch: {cycle}')
+      now = datetime.now().strftime('%Y%m%d%H%M%S')
+      with open('/tmp/main_inner.log', 'a') as f:
+        f.write(f'{now}: save_checkpoint_start {cycle}\n')
       utils.archive_ckpt(eval_results, eval_results['AP'], ckpt)
+      with open('/tmp/main_inner.log', 'a') as f:
+        f.write(f'{now}: save_checkpoint_end {cycle}\n')
+      logging.info(f'save_checkpoint_end for epoch: {cycle}')
 
   else:
     logging.info('Mode not found.')
