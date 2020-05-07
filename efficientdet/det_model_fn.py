@@ -459,6 +459,7 @@ def _model_fn(features, labels, mode, params, model, variable_filter_fn=None):
 
   # Set up training loss and learning rate.
   update_learning_rate_schedule_parameters(params)
+  # global_stepはckptから復元される
   global_step = tf.train.get_or_create_global_step()
   learning_rate = learning_rate_schedule(params, global_step)
 

@@ -116,9 +116,6 @@ flags.DEFINE_integer('min_eval_interval', 180,
 flags.DEFINE_integer(
     'eval_timeout', None,
     'Maximum seconds between checkpoints before evaluation terminates.')
-flags.DEFINE_integer(
-    'starting_epoch', 0,
-    'Starting epoch resume from.')
 
 FLAGS = flags.FLAGS
 
@@ -357,7 +354,8 @@ def main(argv):
                      ckpt)
 
   elif FLAGS.mode == 'train_and_eval':
-    for cycle in range(FLAGS.starting_epoch, config.num_epochs):
+    # resumeした場合、global_stepにstep数が入っていて、cycleは関係がない
+    for cycle in range(config.num_epochs):
       logging.info('Starting training cycle, epoch: %d.', cycle)
       train_estimator = tf.estimator.tpu.TPUEstimator(
           model_fn=model_fn_instance,
